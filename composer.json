@@ -13,6 +13,10 @@
         {
             "name": "All contributors",
             "homepage": "https://github.com/Spomky-Labs/otphp/contributors"
+        },
+        {
+            "name": "Julian Wittorf",
+            "email": "julian.wittorf@student.fh-kiel.de"
         }
     ],
     "require": {
@@ -20,7 +24,12 @@
         "ext-mbstring": "*",
         "paragonie/constant_time_encoding": "^2.0",
         "beberlei/assert": "^3.0",
-        "thecodingmachine/safe": "^0.1.14|^1.0"
+        "thecodingmachine/safe": "^0.1.14|^1.0",
+        "twig/twig": "^3.0",
+        "twig/intl-extra": "^3.0",
+        "ext-simplexml": "*",
+        "ext-iconv": "*",
+        "twbs/bootstrap": "5.0.0-beta1"
     },
     "require-dev": {
         "phpunit/phpunit": "^8.0",
@@ -35,7 +44,10 @@
     "suggest": {
     },
     "autoload": {
-        "psr-4": { "OTPHP\\": "src/" }
+        "psr-4": {
+            "OTPHP\\": "src/",
+            "App\\": "src/"
+        }
     },
     "autoload-dev": {
         "psr-4": { "OTPHP\\Test\\": "tests/" }
