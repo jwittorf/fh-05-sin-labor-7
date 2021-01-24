@@ -5,4 +5,35 @@
 
 {% block content %}
 	<h1>Im Konto anmelden</h1>
+    <form method="post" enctype="application/x-www-form-urlencoded" id="form-login">
+        <div class="form-group row">
+            <label for="input-email" class="col-sm-4 col-form-label text-right">E-Mail</label>
+            <div class="col-sm-8">
+                <input type="email" name="email" id="input-email"
+                       class="form-control" placeholder="bernd@landolf.de" required>
+            </div>
+        </div>
+        <div class="form-group row">
+            <label for="input-password" class="col-sm-4 col-form-label text-right">Passwort</label>
+            <div class="col-sm-8">
+                <input type="password" name="password" id="input-password"
+                       class="form-control" required>
+            </div>
+        </div>
+        <div class="form-group row">
+            <div class="col-sm-12 text-right">
+                <input type="submit" value="Abschicken" class="btn btn-success">
+            </div>
+        </div>
+    </form>
+    <div id="response-login-wrapper">
+        <?php if (array_key_exists("loggedIn", $_SESSION) && $_SESSION["loggedIn"]): ?>
+        <h3>Moin, <?php echo $_SESSION["firstname"] ?> du bist eingeloggt!</h3>
+        <a href="app/logout.php" class="btn btn-danger">Abmelden</a>
+        <hr>
+        <?php else: ?>
+        <p class="alert alert-warning">Du bist zur Zeit nicht eingeloggt.</p>
+        <?php endif; ?>
+    </div>
+    <p class="alert alert-info">Session-ID: <?php echo session_id(); ?></p>
 {% endblock %}
