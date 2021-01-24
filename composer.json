@@ -29,7 +29,9 @@
         "twig/intl-extra": "^3.0",
         "ext-simplexml": "*",
         "ext-iconv": "*",
-        "twbs/bootstrap": "5.0.0-beta1"
+        "twbs/bootstrap": "5.0.0-beta1",
+        "endroid/qr-code": "^3.9",
+        "ext-mysqli": "*"
     },
     "require-dev": {
         "phpunit/phpunit": "^8.0",
