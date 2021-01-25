@@ -37,10 +37,10 @@ if ($_POST) {
         $qrCode = new QrCode("otpauth://totp/SIN Labor 7:$email?secret=$secret&issuer=$firstname");
         $qrCode->writeFile(__DIR__ . "/qrcode.png");
         $qrCodePath = $qrCode->writeDataUri();
-    }
 
-    $error = mysqli_error($db);
-    $statement->close();
+        $error = mysqli_error($db);
+        $statement->close();
+    }
 
 }
 

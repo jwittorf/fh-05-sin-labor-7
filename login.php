@@ -14,16 +14,22 @@ $twig->addExtension(new IntlExtension());
 
 $secret = "";
 $error = "";
-$login = false;
+$login = array_key_exists("email", $_SESSION);
 $verified = false;
-$posted = false;
 $otpCurrent = "";
 
-if ($_POST) {
-    $posted = true;
+if ($_POST || $_SESSION) {
 
-    $email = $_POST["email"];
-    $password = $_POST["password"];
+    if ($_POST) {
+        $email = $_POST["email"];
+        $password = $_POST["password"];
+        $_SESSION['email'] = $email;
+        // TODO: Das sollte man eher nicht machen ...
+        $_SESSION['password'] = $password;
+    } else {
+        $email = $_SESSION['email'];
+        $password = $_SESSION['password'];
+    }
 
     $sqlGetSalt = "SELECT password_salt FROM form_data_users WHERE email = ?";
     // Vorbereitung: Salt für den User/E-Mail holen
@@ -38,34 +44,40 @@ if ($_POST) {
                 $password_welldone = sha1($password . $password_salt . $pepper);
 
                 $sqlGetSecret = "SELECT secret FROM form_data_users WHERE email = ? AND password_hash = ?";
-                $statement = mysqli_prepare($db, $sqlGetSecret);
                 // Vorbereitung: Secret für User/E-Mail holen
-                if ($statement) {
-                    mysqli_stmt_bind_param($statement, "ss", $email, $password_welldone);
-                    if (mysqli_stmt_execute($statement)) {
-                        mysqli_stmt_bind_result($statement, $secret);
-                        if ($login = mysqli_stmt_fetch($statement)) {
+                if ($statement = $db->prepare($sqlGetSecret)) {
+                    $statement->bind_param("ss", $email, $password_welldone);
+                    if ($statement->execute()) {
+                        $statement->bind_result($secret);
+                        if ($login = $statement->fetch()) {
+                            // Login erfolgreich
                             $otp = TOTP::create($secret);
                             $otp->setLabel("SIN Labor 7");
                             $otpCurrent = $otp->now();
 
+                            // Verifizierung prüfen
                             if (array_key_exists("otp", $_POST)) {
                                 $verified = $otp->verify($_POST["otp"]);
                             }
                         }
                     }
+                    $statement->close();
                 }
-                mysqli_stmt_close($statement);
             }
         }
     }
 }
 $error = mysqli_error($db);
 
+if (session_status() === PHP_SESSION_ACTIVE) {
+    $twig->addGlobal("session", $_SESSION);
+} else {
+    $twig->addGlobal("session", []);
+}
+
 echo $twig->render('login.html.twig', [
     "login" => $login,
     "verified" => $verified,
-    "posted" => $posted,
     "otp" => $otpCurrent,
     "error" => $error
 ]);

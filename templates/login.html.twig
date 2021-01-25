@@ -9,14 +9,17 @@
         <div class="col-md-6">
 			<div class="mb-3">
 				<label for="user_email" class="form-label">E-Mail</label>
-				<input type="email" class="form-control" id="user_email" name="email" value="julian.wittorf@student.fh-kiel.de" {% if login %}readonly{% endif %}>
+				<input type="email" class="form-control" id="user_email" name="email" value="{% if session.email %}{{ session.email }}{% else %}julian.wittorf@student.fh-kiel.de{% endif %}" {% if login %}readonly{% endif %}>
 			</div>
 			<div class="mb-3">
 				<label for="user_password" class="form-label">Passwort</label>
-				<input type="password" class="form-control" id="user_password" name="password" value="passw0rd123" {% if login %}readonly{% endif %}>
+				<input type="password" class="form-control" id="user_password" name="password" value="{% if session.password %}{{ session.password }}{% else %}passw0rd123{% endif %}" {% if login %}readonly{% endif %}>
 			</div>
 			<div class="mb-3">
 				<button type="submit" class="btn btn-primary" {% if login %}disabled{% endif %}>Abschicken</button>
+				{% if login %}
+					<a href="logout.php" class="btn btn-danger">Abmelden</a>
+				{% endif %}
 			</div>
 			<div id="response-login-wrapper">
 				{% if login and not verified %}
@@ -43,11 +46,7 @@
 					{% if verified %}
 						<p class='alert alert-success'>Bestätigung erfolgreich!</p>
 					{% else %}
-						{% if posted %}
-							<p class='alert alert-danger'>Bestätigung fehlgeschlagen!</p>
-						{% else %}
-							<p class='alert alert-info'>Bitte den passenden Code eingeben.</p>
-						{% endif %}
+						<p class='alert alert-info'>Bitte den passenden Code eingeben.</p>
 					{% endif %}
 				</div>
 			{% endif %}
