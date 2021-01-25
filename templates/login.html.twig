@@ -5,35 +5,48 @@
 
 {% block content %}
 	<h1>Im Konto anmelden</h1>
-    <form method="post" enctype="application/x-www-form-urlencoded" id="form-login">
-        <div class="form-group row">
-            <label for="input-email" class="col-sm-4 col-form-label text-right">E-Mail</label>
-            <div class="col-sm-8">
-                <input type="email" name="email" id="input-email"
-                       class="form-control" placeholder="bernd@landolf.de" required>
-            </div>
-        </div>
-        <div class="form-group row">
-            <label for="input-password" class="col-sm-4 col-form-label text-right">Passwort</label>
-            <div class="col-sm-8">
-                <input type="password" name="password" id="input-password"
-                       class="form-control" required>
-            </div>
-        </div>
-        <div class="form-group row">
-            <div class="col-sm-12 text-right">
-                <input type="submit" value="Abschicken" class="btn btn-success">
-            </div>
-        </div>
+    <form class="row g-3" id="form-login" method="post">
+        <div class="col-md-6">
+			<div class="mb-3">
+				<label for="user_email" class="form-label">E-Mail</label>
+				<input type="email" class="form-control" id="user_email" name="email" value="julian.wittorf@student.fh-kiel.de" {% if login %}readonly{% endif %}>
+			</div>
+			<div class="mb-3">
+				<label for="user_password" class="form-label">Passwort</label>
+				<input type="password" class="form-control" id="user_password" name="password" value="passw0rd123" {% if login %}readonly{% endif %}>
+			</div>
+			<div class="mb-3">
+				<button type="submit" class="btn btn-primary" {% if login %}disabled{% endif %}>Abschicken</button>
+			</div>
+			<div id="response-login-wrapper">
+				{% if login and not verified %}
+					<p class='alert alert-success'>Anmeldung erfolgreich!</p>
+				{% elseif error %}
+					<p class='alert alert-danger'>SQL Fehler!<br>
+						<code>
+							{{ error }}
+						</code>
+					</p>
+				{% endif %}
+			</div>
+		</div>
+		<div class="col-md-6">
+			{% if login %}
+				<div class="mb-3">
+					<label for="user_otp" class="form-label">OTP aus Authenticator</label>
+					<input type="number" class="form-control" id="user_otp" name="otp" value="" {% if verified %}readonly{% endif %} placeholder="{{ otp }}">
+				</div>
+				<div class="mb-3">
+					<button type="submit" class="btn btn-success btn-lg" {% if verified %}disabled{% endif %}>Bestätigen</button>
+				</div>
+				<div id="response-verify-wrapper">
+					{% if verified %}
+						<p class='alert alert-success'>Bestätigung erfolgreich!</p>
+					{% else %}
+						<p class='alert alert-info'>Bitte den passenden Code eingeben.</p>
+					{% endif %}
+				</div>
+			{% endif %}
+		</div>
     </form>
-    <div id="response-login-wrapper">
-        <?php if (array_key_exists("loggedIn", $_SESSION) && $_SESSION["loggedIn"]): ?>
-        <h3>Moin, <?php echo $_SESSION["firstname"] ?> du bist eingeloggt!</h3>
-        <a href="app/logout.php" class="btn btn-danger">Abmelden</a>
-        <hr>
-        <?php else: ?>
-        <p class="alert alert-warning">Du bist zur Zeit nicht eingeloggt.</p>
-        <?php endif; ?>
-    </div>
-    <p class="alert alert-info">Session-ID: <?php echo session_id(); ?></p>
 {% endblock %}

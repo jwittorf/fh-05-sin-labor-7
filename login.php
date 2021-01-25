@@ -4,7 +4,6 @@ use Twig\Environment;
 use Twig\Loader\FilesystemLoader;
 use Twig\Extra\Intl\IntlExtension;
 use OTPHP\TOTP;
-use Endroid\QrCode\QrCode;
 
 require_once 'vendor/autoload.php';
 require_once "app/db-config.php";
@@ -13,44 +12,71 @@ $loader = new FilesystemLoader('templates');
 $twig = new Environment($loader, ['cache' => false]);
 $twig->addExtension(new IntlExtension());
 
-$otp = TOTP::create(null, 30, 'sha256');
-$otpString = $otp->now();
-$secret = $otp->getSecret();
-
-$resultInsert = false;
+$secret = "";
 $error = "";
-$qrCodePath = "";
+$login = false;
+$verified = false;
+$otpCurrent = "";
 
 if ($_POST) {
 
-    $admin = 0;
     $email = $_POST["email"];
-    $firstname = $_POST["firstname"];
     $password = $_POST["password"];
-    $password_salt = base64_encode("s&meK1ndOfSalt,L0l" . $otpString);
-    $password_welldone = sha1($password . $password_salt . $pepper);
 
-    $sqlInsert = "INSERT INTO form_data_users(admin, firstname, email, password_hash, password_salt, secret) VALUES(?, ?, ?, ?, ?, ?)";
-    $statement = mysqli_prepare($db, $sqlInsert);
-    if ($statement) {
-        mysqli_stmt_bind_param($statement, "isssss", $admin, $firstname, $email, $password_welldone, $password_salt, $secret);
-        $resultInsert = mysqli_stmt_execute($statement);
+    $sqlGetSalt = "SELECT password_salt FROM form_data_users WHERE email = ?";
+    $statementSalt = mysqli_prepare($db, $sqlGetSalt);
+
+    // Vorbereitung: Salt für den User/E-Mail holen
+    if ($statementSalt) {
+        mysqli_stmt_bind_param($statementSalt, "s", $email);
+        if (mysqli_stmt_execute($statementSalt)) {
+            mysqli_stmt_bind_result($statementSalt, $salt);
+            if (mysqli_stmt_fetch($statementSalt)) {
+//                echo "<pre>Salt:";
+//                var_dump($salt);
+//                echo "</pre>";
+                mysqli_stmt_close($statementSalt);
+
+                $password_salt = $salt;
+                $password_welldone = sha1($password . $password_salt . $pepper);
+
+                $sqlGetSecret = "SELECT secret FROM form_data_users WHERE email = ? AND password_hash = ?";
+                $statement = mysqli_prepare($db, $sqlGetSecret);
+                // Vorbereitung: Secret für User/E-Mail holen
+                if ($statement) {
+                    mysqli_stmt_bind_param($statement, "ss", $email, $password_welldone);
+                    if (mysqli_stmt_execute($statement)) {
+                        mysqli_stmt_bind_result($statement, $secret);
+                        if (mysqli_stmt_fetch($statement)) {
+//                            echo "<pre>Secret:";
+//                            var_dump($secret);
+//                            echo "</pre>";
+
+                            $login = true;
+                            $otp = TOTP::create($secret, 30, 'sha256');
+                            $otp->setLabel("SIN Labor 7");
+                            $otpCurrent = $otp->now();
+//                            echo "<pre>Now/OTP:";
+//                            var_dump($otpCurrent);
+//                            echo "</pre>";
+
+                            if (array_key_exists("otp", $_POST)) {
+                                $verified = $otp->verify($_POST["otp"]);
+                            }
+                        }
+                    }
+                }
+                mysqli_stmt_close($statement);
+            }
+        }
     }
-
-    $error = mysqli_error($db);
-    mysqli_stmt_close($statement);
-
-//    $qrCode = new QrCode($secret);
-    $qrCode = new QrCode("otpauth://totp/SIN Labor 7:$email?secret=$secret&issuer=SIN Labor 7");
-    $qrCode->writeFile(__DIR__ . "/qrcode.png");
-    $qrCodePath = $qrCode->writeDataUri();
 }
+$error = mysqli_error($db);
 
-echo $twig->render('register.html.twig', [
-    'otp' => $otpString,
-    'secret' => $secret,
-    'qrCodePath' => $qrCodePath,
-    "resultInsert" => $resultInsert,
+echo $twig->render('login.html.twig', [
+    "login" => $login,
+    "verified" => $verified,
+    "otp" => $otpCurrent,
     "error" => $error
 ]);
 
