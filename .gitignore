@@ -5,3 +5,4 @@ vendor
 data/*
 !data/.gitkeep
 app/db-config.php
+qrcode.png
