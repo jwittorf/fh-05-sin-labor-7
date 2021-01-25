@@ -27,21 +27,20 @@ if ($_POST) {
     $password_welldone = sha1($password . $password_salt . $pepper);
 
     $sqlInsert = "INSERT INTO form_data_users(admin, firstname, email, password_hash, password_salt, secret) VALUES(?, ?, ?, ?, ?, ?)";
-    $statement = mysqli_prepare($db, $sqlInsert);
-    if ($statement) {
+    if ($statement = $db->prepare($sqlInsert)) {
         $otp = TOTP::create();
         $secret = $otp->getSecret();
-        mysqli_stmt_bind_param($statement, "isssss", $admin, $firstname, $email, $password_welldone, $password_salt, $secret);
-        $register = mysqli_stmt_execute($statement);
+        $statement->bind_param("isssss", $admin, $firstname, $email, $password_welldone, $password_salt, $secret);
+        $register = $statement->execute();
 
         //    $qrCode = new QrCode($secret);
-        $qrCode = new QrCode("otpauth://totp/SIN Labor 7:$email?secret=$secret&issuer=SIN Labor 7");
+        $qrCode = new QrCode("otpauth://totp/SIN Labor 7:$email?secret=$secret&issuer=$firstname");
         $qrCode->writeFile(__DIR__ . "/qrcode.png");
         $qrCodePath = $qrCode->writeDataUri();
     }
 
     $error = mysqli_error($db);
-    mysqli_stmt_close($statement);
+    $statement->close();
 
 }
 

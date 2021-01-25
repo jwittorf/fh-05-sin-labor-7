@@ -26,15 +26,13 @@ if ($_POST) {
     $password = $_POST["password"];
 
     $sqlGetSalt = "SELECT password_salt FROM form_data_users WHERE email = ?";
-    $statementSalt = mysqli_prepare($db, $sqlGetSalt);
-
     // Vorbereitung: Salt für den User/E-Mail holen
-    if ($statementSalt) {
-        mysqli_stmt_bind_param($statementSalt, "s", $email);
-        if (mysqli_stmt_execute($statementSalt)) {
-            mysqli_stmt_bind_result($statementSalt, $salt);
-            if (mysqli_stmt_fetch($statementSalt)) {
-                mysqli_stmt_close($statementSalt);
+    if ($statementSalt = $db->prepare($sqlGetSalt)) {
+        $statementSalt->bind_param("s", $email);
+        if ($statementSalt->execute()) {
+            $statementSalt->bind_result($salt);
+            if ($statementSalt->fetch()) {
+                $statementSalt->close();
 
                 $password_salt = $salt;
                 $password_welldone = sha1($password . $password_salt . $pepper);
