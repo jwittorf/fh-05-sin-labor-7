@@ -16,9 +16,11 @@ $secret = "";
 $error = "";
 $login = false;
 $verified = false;
+$posted = false;
 $otpCurrent = "";
 
 if ($_POST) {
+    $posted = true;
 
     $email = $_POST["email"];
     $password = $_POST["password"];
@@ -32,9 +34,6 @@ if ($_POST) {
         if (mysqli_stmt_execute($statementSalt)) {
             mysqli_stmt_bind_result($statementSalt, $salt);
             if (mysqli_stmt_fetch($statementSalt)) {
-//                echo "<pre>Salt:";
-//                var_dump($salt);
-//                echo "</pre>";
                 mysqli_stmt_close($statementSalt);
 
                 $password_salt = $salt;
@@ -47,18 +46,10 @@ if ($_POST) {
                     mysqli_stmt_bind_param($statement, "ss", $email, $password_welldone);
                     if (mysqli_stmt_execute($statement)) {
                         mysqli_stmt_bind_result($statement, $secret);
-                        if (mysqli_stmt_fetch($statement)) {
-//                            echo "<pre>Secret:";
-//                            var_dump($secret);
-//                            echo "</pre>";
-
-                            $login = true;
-                            $otp = TOTP::create($secret, 30, 'sha256');
+                        if ($login = mysqli_stmt_fetch($statement)) {
+                            $otp = TOTP::create($secret);
                             $otp->setLabel("SIN Labor 7");
                             $otpCurrent = $otp->now();
-//                            echo "<pre>Now/OTP:";
-//                            var_dump($otpCurrent);
-//                            echo "</pre>";
 
                             if (array_key_exists("otp", $_POST)) {
                                 $verified = $otp->verify($_POST["otp"]);
@@ -76,6 +67,7 @@ $error = mysqli_error($db);
 echo $twig->render('login.html.twig', [
     "login" => $login,
     "verified" => $verified,
+    "posted" => $posted,
     "otp" => $otpCurrent,
     "error" => $error
 ]);

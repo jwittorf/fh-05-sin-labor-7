@@ -34,16 +34,20 @@
 			{% if login %}
 				<div class="mb-3">
 					<label for="user_otp" class="form-label">OTP aus Authenticator</label>
-					<input type="number" class="form-control" id="user_otp" name="otp" value="" {% if verified %}readonly{% endif %} placeholder="{{ otp }}">
+					<input type="number" class="form-control" id="user_otp" name="otp" value="" placeholder="{{ otp }}" required>
 				</div>
 				<div class="mb-3">
-					<button type="submit" class="btn btn-success btn-lg" {% if verified %}disabled{% endif %}>Bestätigen</button>
+					<button type="submit" class="btn btn-success btn-lg">Bestätigen</button>
 				</div>
 				<div id="response-verify-wrapper">
 					{% if verified %}
 						<p class='alert alert-success'>Bestätigung erfolgreich!</p>
 					{% else %}
-						<p class='alert alert-info'>Bitte den passenden Code eingeben.</p>
+						{% if posted %}
+							<p class='alert alert-danger'>Bestätigung fehlgeschlagen!</p>
+						{% else %}
+							<p class='alert alert-info'>Bitte den passenden Code eingeben.</p>
+						{% endif %}
 					{% endif %}
 				</div>
 			{% endif %}

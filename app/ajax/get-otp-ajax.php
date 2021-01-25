@@ -4,9 +4,6 @@ use OTPHP\TOTP;
 
 require_once '../../vendor/autoload.php';
 
-$otp = TOTP::create("YEDJB2RX3OYWE47QSU5HCUE3MOYINZDKZZZ34PR3K27TF2LGV7R4XHCC2VCAOP542GWUKXGVW43LND3E4ZJBSHYTN54WNBBZNSWW5MY", 30, 'sha256');
-$now = $otp->now();
-
-echo $now;
-echo " | ";
-echo $otp->verify($now);
+$secret = (array_key_exists("s", $_GET) && !empty($_GET["s"])) ? $_GET["s"] : "JNM4R6KF62ZWRZD7VEP7T37IG73XVBRUNCCPV6SW2A6QUN76TZ33YGUDNQPP6JHDM2UWYDXUOA4WNO5EKOXSLPSZQDQ23CBJEP4UX5Y";
+$otp = TOTP::create($secret);
+echo $otp->now();
