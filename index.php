@@ -1,7 +1,5 @@
 <?php
 
-session_start(['cookie_lifetime' => 86400]);
-
 use Twig\Environment;
 use Twig\Loader\FilesystemLoader;
 use Twig\Extra\Intl\IntlExtension;

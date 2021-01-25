@@ -1,7 +1,5 @@
 <?php
 
-session_start(['cookie_lifetime' => 86400]);
-
 use Twig\Environment;
 use Twig\Loader\FilesystemLoader;
 use Twig\Extra\Intl\IntlExtension;
@@ -16,7 +14,6 @@ $twig = new Environment($loader, ['cache' => false]);
 $twig->addExtension(new IntlExtension());
 
 $otp = TOTP::create(null, 30, 'sha256');
-$otpString = $otp->now();
 $secret = $otp->getSecret();
 
 $resultInsert = false;
@@ -29,7 +26,7 @@ if ($_POST) {
     $email = $_POST["email"];
     $firstname = $_POST["firstname"];
     $password = $_POST["password"];
-    $password_salt = base64_encode("s&meK1ndOfSalt,L0l" . $otpString);
+    $password_salt = base64_encode("s&meK1ndOfSalt,L0l");
     $password_welldone = sha1($password . $password_salt . $pepper);
 
     $sqlInsert = "INSERT INTO form_data_users(admin, firstname, email, password_hash, password_salt, secret) VALUES(?, ?, ?, ?, ?, ?)";
@@ -49,9 +46,7 @@ if ($_POST) {
 }
 
 echo $twig->render('register.html.twig', [
-    'otp' => $otpString,
-    'secret' => $secret,
-    'qrCodePath' => $qrCodePath,
+    "qrCodePath" => $qrCodePath,
     "resultInsert" => $resultInsert,
     "error" => $error
 ]);
