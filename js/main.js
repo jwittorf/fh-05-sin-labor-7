@@ -18,7 +18,9 @@ function sendAjax(targetUrl, responseHtmlId, form) {
             document.getElementById(responseHtmlId).innerHTML = this.responseText;
         } else {
             // Anfrage wird verschickt
-            document.getElementById(responseHtmlId).innerHTML = '<p class="alert alert-warning">Sende Daten ...</p>';
+            if (form) {
+                document.getElementById(responseHtmlId).innerHTML = '<p class="alert alert-warning">Sende Daten ...</p>';
+            }
         }
     }
     // Anfrage definieren
@@ -98,3 +100,8 @@ if (document.getElementById("form-show-email")) {
         return false;
     }
 }
+
+// aktuellen OTP zum Debugging live ausgeben
+setInterval(function(){
+    sendAjax("app/ajax/get-otp-ajax.php", "otp-placeholder", false);
+},1000);

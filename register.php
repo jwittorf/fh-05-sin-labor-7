@@ -13,10 +13,7 @@ $loader = new FilesystemLoader('templates');
 $twig = new Environment($loader, ['cache' => false]);
 $twig->addExtension(new IntlExtension());
 
-$otp = TOTP::create(null, 30, 'sha256');
-$secret = $otp->getSecret();
-
-$resultInsert = false;
+$register = false;
 $error = "";
 $qrCodePath = "";
 
@@ -32,22 +29,25 @@ if ($_POST) {
     $sqlInsert = "INSERT INTO form_data_users(admin, firstname, email, password_hash, password_salt, secret) VALUES(?, ?, ?, ?, ?, ?)";
     $statement = mysqli_prepare($db, $sqlInsert);
     if ($statement) {
+        $otp = TOTP::create(null, 30, 'sha256');
+        $secret = $otp->getSecret();
         mysqli_stmt_bind_param($statement, "isssss", $admin, $firstname, $email, $password_welldone, $password_salt, $secret);
-        $resultInsert = mysqli_stmt_execute($statement);
+        $register = mysqli_stmt_execute($statement);
+
+        //    $qrCode = new QrCode($secret);
+        $qrCode = new QrCode("otpauth://totp/SIN Labor 7:$email?secret=$secret&issuer=SIN Labor 7");
+        $qrCode->writeFile(__DIR__ . "/qrcode.png");
+        $qrCodePath = $qrCode->writeDataUri();
     }
 
     $error = mysqli_error($db);
     mysqli_stmt_close($statement);
 
-//    $qrCode = new QrCode($secret);
-    $qrCode = new QrCode("otpauth://totp/SIN Labor 7:$email?secret=$secret&issuer=SIN Labor 7");
-    $qrCode->writeFile(__DIR__ . "/qrcode.png");
-    $qrCodePath = $qrCode->writeDataUri();
 }
 
 echo $twig->render('register.html.twig', [
     "qrCodePath" => $qrCodePath,
-    "resultInsert" => $resultInsert,
+    "register" => $register,
     "error" => $error
 ]);
 

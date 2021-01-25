@@ -23,7 +23,7 @@
 				<button type="submit" class="btn btn-primary">Abschicken</button>
 			</div>
 			<div id="response-register-wrapper">
-				{% if resultInsert %}
+				{% if register %}
 					<h3>Registrierung erfolgreich</h3>
 					<p class='alert alert-success'>Bitte jetzt den QR-Code scannen.</p>
 				{% elseif error %}
@@ -37,7 +37,7 @@
 		</div>
 		<div class="col-md-6">
 			<span class="form-label">Code für Authenticator-App</span><br>
-			{% if resultInsert %}
+			{% if register %}
 				<img src="{{ qrCodePath }}" alt="QR Code zum Scannen">
 			{% else %}
 				<p class="alert alert-info">Der QR-Code wird nach der Registrierung angezeigt.</p>
