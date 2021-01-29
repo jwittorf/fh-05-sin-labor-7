@@ -5,7 +5,11 @@ $host = 'localhost';
 $dbName = 'DEIN_DATENBANKNAME';
 $dbUser = 'root';
 $dbPw = '';
+$pepper = 'HIER_EINEN_RANDOM_STRING_ANGEBEN';
 
 // Verbindung zur Datenbank herstellen, ansonsten das komplette Programm abbrechen
-$db = mysqli_connect($host, $dbUser, $dbPw, $dbName) or
-die('<p class="alert alert-danger">Es konnte keine Verbindung mit dem Datenbankserver hergestellt werden.</p>');
+$db = new mysqli($host, $dbUser, $dbPw, $dbName);
+
+if (mysqli_connect_error()) {
+  die('<p class="alert alert-danger">Es konnte keine Verbindung mit dem Datenbankserver hergestellt werden.</p>');
+}
