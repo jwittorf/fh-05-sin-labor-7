@@ -9,11 +9,11 @@
         <div class="col-md-6">
 			<div class="mb-3">
 				<label for="user_email" class="form-label">E-Mail</label>
-				<input type="email" class="form-control" id="user_email" name="email" value="{% if session.email %}{{ session.email }}{% else %}julian.wittorf@student.fh-kiel.de{% endif %}" {% if login %}readonly{% endif %}>
+				<input type="email" class="form-control" id="user_email" name="email" value="{% if session.email %}{{ session.email }}{% else %}{% endif %}" {% if login %}readonly{% endif %}>
 			</div>
 			<div class="mb-3">
 				<label for="user_password" class="form-label">Passwort</label>
-				<input type="password" class="form-control" id="user_password" name="password" value="{% if session.password %}{{ session.password }}{% else %}passw0rd123{% endif %}" {% if login %}readonly{% endif %}>
+				<input type="password" class="form-control" id="user_password" name="password" value="{% if session.password %}{{ session.password }}{% else %}{% endif %}" {% if login %}readonly{% endif %}>
 			</div>
 			<div class="mb-3">
 				<button type="submit" class="btn btn-primary" {% if login %}disabled{% endif %}>Abschicken</button>
@@ -37,7 +37,7 @@
 			{% if login %}
 				<div class="mb-3">
 					<label for="user_otp" class="form-label">OTP aus Authenticator</label>
-					<input type="number" class="form-control" id="user_otp" name="otp" value="" placeholder="{{ otp }}" required>
+					<input type="number" class="form-control" id="user_otp" name="otp" value="" required>
 				</div>
 				<div class="mb-3">
 					<button type="submit" class="btn btn-success btn-lg">Bestätigen</button>
