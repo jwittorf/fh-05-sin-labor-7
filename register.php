@@ -23,7 +23,7 @@ if ($_POST) {
     $email = $_POST["email"];
     $firstname = $_POST["firstname"];
     $password = $_POST["password"];
-    $password_salt = base64_encode("s&meK1ndOfSalt,L0l");
+    $password_salt = base64_encode("s&meK1ndOfSalt,L0l" . $email . strtoupper($firstname));
     $password_welldone = sha1($password . $password_salt . $pepper);
 
     $sqlInsert = "INSERT INTO form_data_users(admin, firstname, email, password_hash, password_salt, secret) VALUES(?, ?, ?, ?, ?, ?)";
